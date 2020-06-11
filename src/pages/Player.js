@@ -1,5 +1,5 @@
 // @todo: import MediaPlayer from SDK
-import {Lightning, Utils} from "wpe-lightning-sdk";
+import {Lightning, Utils, MediaPlayer} from "wpe-lightning-sdk";
 
 export default class Player extends Lightning.Component {
     static _template() {
@@ -46,6 +46,10 @@ export default class Player extends Lightning.Component {
 
     stop() {
 
+    }
+
+    set item(v){
+        this._item = v;
     }
 
     /**
