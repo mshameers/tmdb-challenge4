@@ -60,6 +60,15 @@ export default class Details extends Lightning.Component{
         this.tag("Details").setSmooth("x", 90);
     }
 
+    set itemType(v){
+        this._itemType = v;
+    }
+
+    set itemId(v){
+        this._itemId = v;
+    }
+
+
     set details(v) {
         this._details = v;
         const image = getImgUrl(this._details.poster, 500);
@@ -88,6 +97,10 @@ export default class Details extends Lightning.Component{
 
     _handleUp() {
         Router.focusWidget("menu");
+    }
+
+    _handleEnter(){
+        Router.navigate(`details/${this._itemType}/${this._itemId}/play`);
     }
 
     _getFocused() {

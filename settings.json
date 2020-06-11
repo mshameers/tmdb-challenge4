@@ -19,6 +19,6 @@
     "lazyCreate": true,
     "lazyDestroy": true,
     "reuseInstance": true,
-    "logRoute": false
+    "logRoute": true
   }
 }

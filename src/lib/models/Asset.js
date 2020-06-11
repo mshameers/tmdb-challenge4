@@ -66,6 +66,10 @@ export default class Asset {
         return this._video;
     }
 
+    get stream(){
+        return "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/1080/Big_Buck_Bunny_1080_10s_1MB.mp4";
+    }
+
     get voteAverage() {
         return this._vote_average;
     }

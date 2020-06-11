@@ -11,7 +11,6 @@ import {getPopular, getDetails} from './api';
 */
 export default () => {
 
-
     Router.boot(async()=> {
         // this will always be called
     });
@@ -22,25 +21,18 @@ export default () => {
      */
 
     Router.before("home/browse/movies", async ({page})=>{
-        const assets = await getPopular('movie');
-        page.data = assets;
+        page.data = await getPopular('movie');;
     }, 10 * 60 /* expires */);
 
     Router.before("home/browse/series", async ({page})=>{
-        const assets = await getPopular('tv');
-        page.data = assets;
+        page.data =  await getPopular('tv');;
     }, 10 * 60 /* expires */);
 
     Router.before("details/:itemType/:itemId", async ({page, itemType, itemId})=>{
-        const details = await getDetails(itemType, itemId);
-        page.details = details;
+        page.details = await getDetails(itemType, itemId);;
     });
 
-
-    /**
-     * @todo:
-     * add a data-provider for the new series route
-     * and make sure you call grab the series from TMDBl
-     * https://api.themoviedb.org/3/tv/popular?api_key=${apiKey}
-     */
+    Router.before("details/:itemType/:itemId/play", async ({page, itemType, itemId})=>{
+        page.item = await getDetails(itemType, itemId);
+    });
 }
