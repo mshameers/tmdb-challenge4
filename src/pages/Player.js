@@ -1,84 +1,105 @@
-// @todo: import MediaPlayer from SDK
 import {Lightning, Utils, MediaPlayer} from "wpe-lightning-sdk";
+import {getFormattedTime} from '../lib/tools'
 
 export default class Player extends Lightning.Component {
     static _template() {
         return {
-            /**
-             * @todo:
-             * - Add MediaPlayer component (that you've imported via SDK)
-             * - Add a rectangle overlay with gradient color to the bottom of the screen
-             * - Add A Controls:{} Wrapper that hosts the following components:
-             *   - PlayPause button image (see static/mediaplayer folder)
-             *   - A skip button (see static/mediaplayer folder)
-             *   - Progress bar (2 rectangles?)
-             *   - add duration label
-             *   - add text label for currentTime
-             */
+            MediaPlayer: {
+                type: MediaPlayer
+            },
+            Overlay: {
+                rect: true, w: 1920, h: 200, y: 1080, mountY: 1, colorTop:0x00000000, colorBottom: 0xff000000
+            },
+            Controls: {
+                alpha: 0, x:50, y:1000,
+                PlayPause: {
+                    src: Utils.asset("mediaplayer/play.png")
+                },
+                Skip: {
+                    x: 50,
+                    src: Utils.asset("mediaplayer/skip.png")
+                },
+                Progress: {
+                    x: 100, y:10,
+                    Bar:{
+                        rect: true, color:0x20ffffff, h:10, w:1550
+                    },
+                    Duration:{
+                        rect: true, color:0xffffffff, h:10
+                    }
+                },
+                Info: {
+                    x: 1750, y: 10, mount: 0.5,
+                    text: {text: '', fontSize: 35, fontFace: "SourceSansPro-Regular"}
+                }
+            }
         };
     }
 
     _init() {
-        /**
-         * @todo:
-         * tag MediaPlayer component and set correct consumer
-         */
+        this.tag("MediaPlayer").updateSettings({
+            consumer: this
+        });
     }
 
-    /**
-     *@todo:
-     * add focus and unfocus handlers
-     * focus => show controls
-     * unfocus => hide controls
-     */
+    _focus(){
+        this.application.emit("toggleBackgound", true);
+        this.tag("Controls").alpha = 1;
+    }
 
+    _unfocus(){
+        this.tag("Controls").alpha = 0;
+        this.application.emit("toggleBackgound", false);
+    }
 
-    /**
-     * @todo:
-     * When your App is in Main state, call this method
-     * and play the video loop (also looped)
-     * @param src
-     * @param loop
-     */
     play(src, loop) {
-
+        this.tag("MediaPlayer").open(src);
+        this.tag("MediaPlayer").loop = loop;
     }
 
     stop() {
-
+        this.tag("MediaPlayer").close();
     }
 
     set item(v){
-        this._item = v;
+        this.play(v.stream, true);
     }
 
-    /**
-     * @todo:
-     * - add _handleEnter() method and make sure the video Pauses
-     */
     _handleEnter(){
-
+        this.tag("MediaPlayer").doPause();
     }
 
-    /**
-     * This will be automatically called when the mediaplayer pause event is triggerd
-     * @todo:
-     * - Add this Component in a Paused state
-     */
+    _handleRight(){
+        this.tag("MediaPlayer").getPosition().then((__currentPos)=>{
+            console.log(__currentPos);
+            this.tag("MediaPlayer").setPosition(__currentPos + 5);
+        })
+    }
+
     $mediaplayerPause() {
-
+        this._setState("Paused")
     }
 
+    $mediaplayerPlay() {
+        this._setState("Playing");
+    }
+
+    showProgress(currentTime, duration) {
+        const p = currentTime / Math.max(duration, 1);
+        this.tag("Duration").setSmooth("w", p*1550);
+        this.tag("Info").text.text = `${getFormattedTime(p*10)}/${getFormattedTime(duration)}`;
+    }
 
     static _states(){
         return [
-            /**
-             * @todo:
-             * - Add paused state
-             * - on enter change the play to pause button (see static/mediaplayer folder)
-             * - on _handleEnter() play the asset again
-             * - reset state on play
-             */
+            class Playing extends this{
+                $enter(){
+                    this.tag("PlayPause").src = Utils.asset("mediaplayer/pause.png");
+                }
+                $mediaplayerProgress({currentTime, duration}) {
+                    this.showProgress(currentTime, duration);
+                }
+            },
             class Paused extends this{
                 $enter(){
                     this.tag("PlayPause").src = Utils.asset("mediaplayer/play.png");

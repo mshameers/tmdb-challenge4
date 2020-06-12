@@ -34,5 +34,12 @@ export default class Background extends Lightning.Component{
             });
 
         });
+
+        this.application.on("toggleBackgound", (__shouldHide) => {
+            console.log(__shouldHide);
+            this.tag("Background").patch({
+                smooth: {alpha: __shouldHide ? 0: 1}
+            });
+        });
     }
 }
